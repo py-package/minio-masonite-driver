@@ -45,4 +45,18 @@ MINIO_BUCKET=
 MINIO_URL=
 ```
 
+**Example**
+
+```python
+
+from masonite.request import Request
+from masonite import Upload
+
+def your_function(request: Request, upload: Upload):
+    file = request.input('file')
+    key = upload.store(file)
+    file_url = upload.url(key, 3600) # url accepts file key and the expiry time for signed url
+    return file_url
+```
+
 Enjoy ;)

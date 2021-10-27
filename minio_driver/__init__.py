@@ -64,3 +64,50 @@ class UploadMinioDriver(BaseUploadDriver, UploadContract):
         client.upload_file(file_location, self.config.DRIVERS["minio"]["bucket"], location)
 
         return filename
+
+    def url(self, filekey, expires_in=3600):
+        """Get the url for the file.
+
+        Arguments:
+            filekey {string} -- File key.
+
+        Raises:
+            DriverLibraryNotFound -- Raises when the boto3 library is not installed.
+
+        Returns:
+            string -- Returns the file url from given key.
+        """
+        try:
+            import boto3
+        except ImportError:
+            raise DriverLibraryNotFound(
+                'Could not find the "boto3" library. Please pip install this library by running "pip install boto3"'
+            )
+
+        if filekey is None:
+            raise Exception(
+                'Filekey is missing'
+            )
+
+        session = boto3.Session(
+            aws_access_key_id=self.config.DRIVERS["minio"]["client"],
+            aws_secret_access_key=self.config.DRIVERS["minio"]["secret"],
+        )
+
+        client = session.client(
+            "s3",
+            endpoint_url=self.config.DRIVERS["minio"]["endpoint"],
+        )
+
+        try:
+            url = client.generate_presigned_url(
+                "get_object",
+                ExpiresIn=expires_in,
+                Params={"Bucket": self.config.DRIVERS["minio"]["bucket"], "Key": filekey},
+            )
+
+            return url
+        except Exception as e:
+            raise Exception(
+                e
+            )

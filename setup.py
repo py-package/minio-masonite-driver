@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="minio_driver",
-    version='0.0.7',
+    version='0.0.8',
     packages=['minio_driver'],
     author="Yubaraj Shrestha",
     author_email="companion.krish@outlook.com",

@@ -1,26 +1,21 @@
 """A MinioProvider Service Provider."""
-
-from masonite.managers.UploadManager import UploadManager
-from masonite.provider import ServiceProvider
-from masonite.view import View
-
-from . import UploadMinioDriver
-from masonite.helpers import config
-from masonite.helpers.static import static
-from masonite import Upload
+from .MinioDriver import MinioDriver
+from masonite.providers import Provider
+from masonite.filesystem import Storage
+from masonite.configuration import config
 
 
-class MinioProvider(ServiceProvider):
-    """Provides Services To The Service Container."""
+class MinioProvider(Provider):
 
-    wsgi = False
+    def __init__(self, application):
+        self.application = application
 
     def register(self):
-        """Register objects into the Service Container."""
-        self.app.bind('UploadMinioDriver', UploadMinioDriver)
+        storage = Storage(self.application).set_configuration(
+            config("filesystem.disks")
+        )
+        storage.add_driver("minio", MinioDriver(self.application))
+        self.application.bind("storage", storage)
 
-    def boot(self, manager: UploadManager, view: View):
-        """Boots services required by the container."""
-        self.app.bind("Upload", manager.driver(config("storage").DRIVER))
-        self.app.swap(Upload, manager.driver(config("storage").DRIVER))
-        view.share({"static": static})
+    def boot(self):
+        pass

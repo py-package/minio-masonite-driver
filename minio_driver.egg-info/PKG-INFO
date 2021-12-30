@@ -1,0 +1,81 @@
+Metadata-Version: 2.1
+Name: minio-driver
+Version: 0.1.1
+Summary: Minio Storage Driver for Masonite
+Home-page: https://github.com/yubarajshrestha/minio-masonite-driver
+Author: Yubaraj Shrestha
+Author-email: companion.krish@outlook.com
+License: MIT
+Keywords: masonite,storage,minio,masonite-storage-driver
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+#### Project description
+
+**What is Minio-Driver?**
+It's an extra storage driver support for Minio in masonite 4.
+
+**Setup**
+
+Install package using pip:
+
+```shell
+pip install minio-driver
+```
+
+Add provider inside config/providers.py.
+
+```python
+from minio_driver.MinioProvider import MinioProvider
+
+PROVIDERS = [
+    ...,
+    # Application Providers
+    MinioProvider,
+]
+```
+
+**Storage Config**
+
+Add following configuration inside config/filesystem.py after `"s3": {...},`
+
+```python
+"minio": {
+    "driver": "minio",
+    "client": env("MINIO_CLIENT"),
+    "secret": env("MINIO_SECRET"),
+    "bucket": env("MINIO_BUCKET"),
+    "path": env("MINIO_ENDPOINT"),
+},
+```
+
+Add following keys in `.env`.
+
+```shell
+MINIO_CLIENT=
+MINIO_SECRET=
+MINIO_BUCKET=
+MINIO_ENDPOINT=
+```
+
+**Example**
+
+```python
+from masonite.controllers import Controller
+from masonite.filesystem import Storage
+from masonite.request import Request
+
+class YourController(Controller):
+
+    def your_function(self, request: Request, storage: Storage):
+        file = request.input('file')
+        path = storage.disk("minio").put_file('your_file_directory', file)
+        return path
+```
+
+Enjoy ;)
+
+

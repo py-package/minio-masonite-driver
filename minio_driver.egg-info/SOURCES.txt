@@ -1,0 +1,14 @@
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+setup.py
+minio_driver.egg-info/PKG-INFO
+minio_driver.egg-info/SOURCES.txt
+minio_driver.egg-info/dependency_links.txt
+minio_driver.egg-info/requires.txt
+minio_driver.egg-info/top_level.txt
+src/MinioDriver.py
+src/MinioProvider.py
+src/__init__.py
+src/integration.py

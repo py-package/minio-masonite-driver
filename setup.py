@@ -19,7 +19,7 @@ setup(
     packages=['minio_driver'],
     package_dir={"minio_driver": "src"},
     install_requires=[
-        'masonite',
+        'masonite>=4.0,<5.0',
     ],
     license="MIT",
     include_package_data=True,

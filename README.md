@@ -1,7 +1,7 @@
 #### Project description
 
 **What is Minio-Driver?**
-It's an extra storage driver for masonite. It adds support for minio server.
+It's an extra storage driver support for Minio in masonite 4.
 
 **Setup**
 
@@ -25,38 +25,40 @@ PROVIDERS = [
 
 **Storage Config**
 
-Add following configuration inside config/storage.py after `"disk": {"location": "storage/uploads"},`
+Add following configuration inside config/filesystem.py after `"s3": {...},`
 
-```json
+```python
 "minio": {
-    "endpoint": env("MINIO_URL", "https://min.io"),
-    "client": env("MINIO_CLIENT", "AxJz..."),
-    "secret": env("MINIO_SECRET", "HkZj..."),
-    "bucket": env("MINIO_BUCKET", "s3bucket"),
+    "driver": "minio",
+    "client": env("MINIO_CLIENT"),
+    "secret": env("MINIO_SECRET"),
+    "bucket": env("MINIO_BUCKET"),
+    "path": env("MINIO_ENDPOINT"),
 },
 ```
 
 Add following keys in `.env`.
 
-```
+```shell
 MINIO_CLIENT=
 MINIO_SECRET=
 MINIO_BUCKET=
-MINIO_URL=
+MINIO_ENDPOINT=
 ```
 
 **Example**
 
 ```python
-
+from masonite.controllers import Controller
+from masonite.filesystem import Storage
 from masonite.request import Request
-from masonite import Upload
 
-def your_function(request: Request, upload: Upload):
-    file = request.input('file')
-    key = upload.store(file)
-    file_url = upload.url(key, 3600) # url accepts file key and the expiry time for signed url
-    return file_url
+class YourController(Controller):
+
+    def your_function(self, request: Request, storage: Storage):
+        file = request.input('file')
+        path = storage.disk("minio").put_file('your_file_directory', file)
+        return path
 ```
 
 Enjoy ;)

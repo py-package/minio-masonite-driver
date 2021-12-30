@@ -38,7 +38,7 @@ class MinioDriver:
         return f"{alias}{extension}"
 
     def put(self, file_path, content):
-        self.get_connection().resource("s3", endpoint_url="https://minio.bushlot.ca").Bucket(self.get_bucket()).put_object(
+        self.get_connection().resource("s3", endpoint_url=self.options.get("path")).Bucket(self.get_bucket()).put_object(
             Key=file_path, Body=content
         )
         return content
@@ -49,7 +49,7 @@ class MinioDriver:
         if hasattr(content, "get_content"):
             content = content.get_content()
 
-        self.get_connection().resource("s3", endpoint_url="https://minio.bushlot.ca").Bucket(self.get_bucket()).put_object(
+        self.get_connection().resource("s3", endpoint_url=self.options.get("path")).Bucket(self.get_bucket()).put_object(
             Key=os.path.join(file_path, file_name), Body=content
         )
         return os.path.join(file_path, file_name)
@@ -58,7 +58,7 @@ class MinioDriver:
         try:
             return (
                 self.get_connection()
-                .resource("s3")
+                .resource("s3", endpoint_url=self.options.get("path"))
                 .Bucket(self.get_bucket())
                 .Object(file_path)
                 .get()
@@ -76,7 +76,7 @@ class MinioDriver:
 
     def exists(self, file_path):
         try:
-            self.get_connection().resource("s3").Bucket(self.get_bucket()).Object(
+            self.get_connection().resource("s3", endpoint_url=self.options.get("path")).Bucket(self.get_bucket()).Object(
                 file_path
             ).get().get("Body").read()
             return True
@@ -89,7 +89,7 @@ class MinioDriver:
     def stream(self, file_path):
         return FileStream(
             self.get_connection()
-            .resource("s3")
+            .resource("s3", endpoint_url=self.options.get("path"))
             .Bucket(self.get_bucket())
             .Object(file_path)
             .get()
@@ -100,7 +100,7 @@ class MinioDriver:
 
     def copy(self, from_file_path, to_file_path):
         copy_source = {"Bucket": self.get_bucket(), "Key": from_file_path}
-        self.get_connection().resource("s3").meta.client.copy(
+        self.get_connection().resource("s3", endpoint_url=self.options.get("path")).meta.client.copy(
             copy_source, self.get_bucket(), to_file_path
         )
 
@@ -122,14 +122,14 @@ class MinioDriver:
     def delete(self, file_path):
         return (
             self.get_connection()
-            .resource("s3")
+            .resource("s3", endpoint_url=self.options.get("path"))
             .Object(self.get_bucket(), file_path)
             .delete()
         )
 
     def store(self, file, name=None):
         full_path = name or file.hash_path_name()
-        self.get_connection().resource("s3").Bucket(self.get_bucket()).put_object(
+        self.get_connection().resource("s3", endpoint_url=self.options.get("path")).Bucket(self.get_bucket()).put_object(
             Key=full_path, Body=file.stream()
         )
         return full_path

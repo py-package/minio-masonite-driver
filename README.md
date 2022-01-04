@@ -1,6 +1,7 @@
 #### Project description
 
 **What is Minio-Driver?**
+
 It's an extra storage driver support for Minio in masonite 4.
 
 **Setup**
@@ -44,6 +45,12 @@ MINIO_CLIENT=
 MINIO_SECRET=
 MINIO_BUCKET=
 MINIO_ENDPOINT=
+```
+
+Update the storage driver value to `minio` in `.env`
+
+```shell
+STORAGE_DRIVER=minio
 ```
 
 **Example**

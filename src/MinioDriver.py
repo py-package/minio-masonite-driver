@@ -38,9 +38,9 @@ class MinioDriver:
         return f"{alias}{extension}"
 
     def put(self, file_path, content):
-        self.get_connection().resource("s3", endpoint_url=self.options.get("path")).Bucket(self.get_bucket()).put_object(
-            Key=file_path, Body=content
-        )
+        self.get_connection().resource(
+            "s3", endpoint_url=self.options.get("path")
+        ).Bucket(self.get_bucket()).put_object(Key=file_path, Body=content)
         return content
 
     def put_file(self, file_path, content, name=None):
@@ -48,8 +48,12 @@ class MinioDriver:
 
         if hasattr(content, "get_content"):
             content = content.get_content()
+            
+        print(self.options)
 
-        self.get_connection().resource("s3", endpoint_url=self.options.get("path")).Bucket(self.get_bucket()).put_object(
+        self.get_connection().resource(
+            "s3", endpoint_url=self.options.get("path")
+        ).Bucket(self.get_bucket()).put_object(
             Key=os.path.join(file_path, file_name), Body=content
         )
         return os.path.join(file_path, file_name)
@@ -64,7 +68,7 @@ class MinioDriver:
                 .get()
                 .get("Body")
                 .read()
-                .decode("utf-8")
+                .decode("utf-8", "ignore")
             )
         except self.missing_file_exceptions():
             pass
@@ -76,9 +80,9 @@ class MinioDriver:
 
     def exists(self, file_path):
         try:
-            self.get_connection().resource("s3", endpoint_url=self.options.get("path")).Bucket(self.get_bucket()).Object(
-                file_path
-            ).get().get("Body").read()
+            self.get_connection().resource(
+                "s3", endpoint_url=self.options.get("path")
+            ).Bucket(self.get_bucket()).Object(file_path).get().get("Body").read()
             return True
         except self.missing_file_exceptions():
             return False
@@ -100,9 +104,9 @@ class MinioDriver:
 
     def copy(self, from_file_path, to_file_path):
         copy_source = {"Bucket": self.get_bucket(), "Key": from_file_path}
-        self.get_connection().resource("s3", endpoint_url=self.options.get("path")).meta.client.copy(
-            copy_source, self.get_bucket(), to_file_path
-        )
+        self.get_connection().resource(
+            "s3", endpoint_url=self.options.get("path")
+        ).meta.client.copy(copy_source, self.get_bucket(), to_file_path)
 
     def move(self, from_file_path, to_file_path):
         self.copy(from_file_path, to_file_path)
@@ -129,9 +133,9 @@ class MinioDriver:
 
     def store(self, file, name=None):
         full_path = name or file.hash_path_name()
-        self.get_connection().resource("s3", endpoint_url=self.options.get("path")).Bucket(self.get_bucket()).put_object(
-            Key=full_path, Body=file.stream()
-        )
+        self.get_connection().resource(
+            "s3", endpoint_url=self.options.get("path")
+        ).Bucket(self.get_bucket()).put_object(Key=full_path, Body=file.stream())
         return full_path
 
     def make_file_path_if_not_exists(self, file_path):
@@ -143,3 +147,21 @@ class MinioDriver:
             return True
 
         return False
+    
+    def get_secure_url(self, file_path, expires=2600):
+        # get s3 signed url from file path
+        try:
+            return self.get_connection().client(
+                    "s3",
+                    endpoint_url=self.options.get("path")
+                ).generate_presigned_url(
+                "get_object",
+                Params={
+                    'Bucket': self.get_bucket(),
+                    'Key': file_path
+                },
+                ExpiresIn=expires,
+            )
+        except Exception as e:
+            print(e)
+        return None

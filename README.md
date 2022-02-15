@@ -64,8 +64,13 @@ class YourController(Controller):
 
     def your_function(self, request: Request, storage: Storage):
         file = request.input('file')
+
+        # storing file
         path = storage.disk("minio").put_file('your_file_directory', file)
-        return path
+
+        # getting file_url from storage
+        file_url = storage.disk("minio").get_secure_url(path)
+        return file_url
 ```
 
 Enjoy ;)

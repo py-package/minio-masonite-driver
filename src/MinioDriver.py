@@ -47,12 +47,12 @@ class MinioDriver:
     def put_file(self, file_path, content, name=None):
         file_name = self.get_name(content.name, name or str(uuid.uuid4()))
         
+        # get content type from content (file)
+        mimetype = mimetypes.guess_type(content.name)[0]
 
         if hasattr(content, "get_content"):
             content = content.get_content()
         
-        # get content type from content (file)
-        mimetype = mimetypes.guess_type(content.name)[0]
 
         self.get_connection().resource(
             "s3", endpoint_url=self.options.get("path")

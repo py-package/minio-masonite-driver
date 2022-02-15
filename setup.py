@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="minio_driver",
-    version='0.1.3',
+    version="0.1.4",
     author="Yubaraj Shrestha",
     author_email="companion.krish@outlook.com",
     description="Minio Storage Driver for Masonite",
@@ -16,12 +16,12 @@ setup(
         "Programming Language :: Python :: 3",
         "Framework :: Masonite",
     ],
-    packages=['minio_driver'],
+    packages=["minio_driver"],
     package_dir={"minio_driver": "src"},
     install_requires=[
-        'masonite>=4.0,<5.0',
+        "masonite>=4.0,<5.0",
     ],
     license="MIT",
     include_package_data=True,
-    keywords=["masonite", "storage", "minio", "masonite-storage-driver"]
+    keywords=["masonite", "storage", "minio", "masonite-storage-driver"],
 )

@@ -1,3 +1,4 @@
+import mimetypes
 import os
 from shutil import copyfile, move
 import uuid
@@ -45,16 +46,18 @@ class MinioDriver:
 
     def put_file(self, file_path, content, name=None):
         file_name = self.get_name(content.name, name or str(uuid.uuid4()))
+        
 
         if hasattr(content, "get_content"):
             content = content.get_content()
-            
-        print(self.options)
+        
+        # get content type from content (file)
+        mimetype = mimetypes.guess_type(content.name)[0]
 
         self.get_connection().resource(
             "s3", endpoint_url=self.options.get("path")
         ).Bucket(self.get_bucket()).put_object(
-            Key=os.path.join(file_path, file_name), Body=content
+            Key=os.path.join(file_path, file_name), Body=content, ContentType=mimetype
         )
         return os.path.join(file_path, file_name)
 
